@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/amedoeyes/hadath/config"
 	"github.com/gorilla/mux"
 )
 
@@ -28,6 +29,9 @@ func RegisterRoutes() *mux.Router {
 }
 
 func main() {
-	log.Println("Starting server on :8000")
-	http.ListenAndServe(":8000", RegisterRoutes())
+	config.LoadConfig()
+	cfg := config.Get()
+	addr := fmt.Sprintf("%s:%d", cfg.ServerHost(), cfg.ServerPort())
+	log.Printf("Starting server at %s", addr)
+	http.ListenAndServe(addr, RegisterRoutes())
 }
