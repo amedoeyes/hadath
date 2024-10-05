@@ -6,32 +6,28 @@ import (
 	"net/http"
 
 	"github.com/amedoeyes/hadath/config"
-	"github.com/gorilla/mux"
+	"github.com/amedoeyes/hadath/internal/database"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
-func hello(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "hello\n")
-}
-
-func headers(w http.ResponseWriter, req *http.Request) {
-	for name, headers := range req.Header {
-		for _, h := range headers {
-			fmt.Fprintf(w, "%v: %v\n", name, h)
-		}
-	}
-}
-
-func RegisterRoutes() *mux.Router {
-	router := mux.NewRouter()
-	router.HandleFunc("/hello", hello)
-	router.HandleFunc("/headers", headers)
+func RegisterRoutes() *chi.Mux {
+	router := chi.NewRouter()
+	router.Use(middleware.Logger)
+	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("welcome"))
+	})
 	return router
 }
 
 func main() {
 	config.LoadConfig()
+	err := database.Connect()
+	if err != nil {
+		return
+	}
 	cfg := config.Get()
 	addr := fmt.Sprintf("%s:%d", cfg.ServerHost(), cfg.ServerPort())
 	log.Printf("Starting server at %s", addr)
-	http.ListenAndServe(addr, RegisterRoutes())
+	log.Fatal(http.ListenAndServe(addr, RegisterRoutes()))
 }
