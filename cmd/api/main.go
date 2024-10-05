@@ -21,11 +21,14 @@ func RegisterRoutes() *chi.Mux {
 }
 
 func main() {
-	config.LoadConfig()
+	config.Load()
 	err := database.Connect()
 	if err != nil {
+		log.Fatal(err)
 		return
 	}
+	defer database.Disconnect()
+
 	cfg := config.Get()
 	addr := fmt.Sprintf("%s:%d", cfg.ServerHost(), cfg.ServerPort())
 	log.Printf("Starting server at %s", addr)
