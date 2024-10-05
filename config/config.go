@@ -3,7 +3,6 @@ package config
 import (
 	"os"
 	"strconv"
-	"sync"
 
 	"github.com/joho/godotenv"
 )
@@ -47,24 +46,19 @@ func (c *Config) DBName() string {
 	return c.dbName
 }
 
-var (
-	config *Config
-	once   sync.Once
-)
+var config *Config
 
-func LoadConfig() {
-	once.Do(func() {
-		godotenv.Load()
-		config = &Config{
-			serverHost: getEnv("SERVER_HOST", "localhost"),
-			serverPort: getEnvAsInt("SERVER_PORT", 8080),
-			dbHost:     getEnv("DB_HOST", "localhost"),
-			dbPort:     getEnvAsInt("DB_PORT", 5432),
-			dbUser:     getEnv("DB_USER", ""),
-			dbPassword: getEnv("DB_PASSWORD", ""),
-			dbName:     getEnv("DB_NAME", ""),
-		}
-	})
+func Load() {
+	godotenv.Load()
+	config = &Config{
+		serverHost: getEnv("SERVER_HOST", "localhost"),
+		serverPort: getEnvAsInt("SERVER_PORT", 8080),
+		dbHost:     getEnv("DB_HOST", "localhost"),
+		dbPort:     getEnvAsInt("DB_PORT", 5432),
+		dbUser:     getEnv("DB_USER", ""),
+		dbPassword: getEnv("DB_PASSWORD", ""),
+		dbName:     getEnv("DB_NAME", ""),
+	}
 }
 
 func Get() *Config {
