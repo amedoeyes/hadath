@@ -8,13 +8,13 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var pool *pgxpool.Pool
+var db *pgxpool.Pool
 
-func Connect() error {
+func Connect(ctx context.Context) error {
 	cfg := config.Get()
 	url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", cfg.DBUser(), cfg.DBPassword(), cfg.DBHost(), cfg.DBPort(), cfg.DBName())
 	var err error
-	pool, err = pgxpool.New(context.Background(), url)
+	db, err = pgxpool.New(ctx, url)
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
@@ -22,9 +22,9 @@ func Connect() error {
 }
 
 func Disconnect() {
-	pool.Close()
+	db.Close()
 }
 
 func Get() *pgxpool.Pool {
-	return pool
+	return db
 }
