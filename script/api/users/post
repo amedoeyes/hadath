@@ -1,0 +1,15 @@
+#!/bin/bash
+
+ROUTE="users"
+METHOD="POST"
+DATA=$(
+	cat <<EOF
+{
+	"name": "cat",
+	"email": "cat@cat.com",
+	"password": "password"
+}
+EOF
+)
+
+source "$(dirname "${BASH_SOURCE[0]}")/../request"

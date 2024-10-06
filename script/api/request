@@ -1,0 +1,26 @@
+#!/bin/bash
+
+source "$(dirname "${BASH_SOURCE[0]}")/../../.env"
+
+URL="$SERVER_HOST:$SERVER_PORT/$ROUTE"
+METHOD=${METHOD:-"GET"}
+CONTENT_TYPE=${CONTENT_TYPE:-"application/json"}
+
+header_file=$(mktemp)
+
+response=$(curl -s \
+	-D "$header_file" \
+	-X "$METHOD" "$URL" \
+	-H "Content-Type: $CONTENT_TYPE" \
+	-d "$DATA")
+
+cat "$header_file"
+
+content_type=$(grep "Content-Type" "$header_file" | awk '{ print $2 }' | tr -d '\r')
+if [[ "$content_type" == "application/json" ]]; then
+	echo "$response" | jq .
+else
+	echo "$response"
+fi
+
+rm "$header_file"
