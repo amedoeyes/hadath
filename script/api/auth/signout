@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ROUTE="auth/signout"
+METHOD="POST"
+AUTHORIZATION="Bearer 23c93170e96f1b037a9f4a08f6fa8ee190b458a52fd1d82552dcff405a09c520"
+
+source "$(dirname "${BASH_SOURCE[0]}")/../request"

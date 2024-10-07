@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ROUTE="users"
+ROUTE="auth/signup"
 METHOD="POST"
 DATA=$(
 	cat <<EOF
