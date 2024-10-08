@@ -1,7 +1,11 @@
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type APIKey struct {
-	ID     uint32
-	UserID uint32
+	ID     uuid.UUID
+	UserID uuid.UUID
 	Key    string
 }

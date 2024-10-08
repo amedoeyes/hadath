@@ -6,6 +6,7 @@ import (
 
 	"github.com/amedoeyes/hadath/internal/model"
 	"github.com/amedoeyes/hadath/internal/service"
+	"github.com/google/uuid"
 )
 
 type AuthHandler struct {
@@ -42,10 +43,10 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 	}
 	var response struct {
-		ID     uint32 `json:"id"`
-		Name   string `json:"name"`
-		Email  string `json:"email"`
-		APIKey string `json:"api_key"`
+		ID     uuid.UUID `json:"id"`
+		Name   string    `json:"name"`
+		Email  string    `json:"email"`
+		APIKey string    `json:"api_key"`
 	}
 
 	err := json.NewDecoder(r.Body).Decode(&request)

@@ -6,6 +6,7 @@ import (
 	"github.com/amedoeyes/hadath/internal/model"
 	"github.com/amedoeyes/hadath/internal/repository"
 	"github.com/amedoeyes/hadath/internal/utility"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -59,6 +60,6 @@ func (s *AuthService) SignIn(ctx context.Context, email, password string) (*mode
 	return user, apiKey, err
 }
 
-func (s *AuthService) SignOut(ctx context.Context, id uint32) error {
+func (s *AuthService) SignOut(ctx context.Context, id uuid.UUID) error {
 	return s.apiKeyRepo.DeleteByID(ctx, id)
 }

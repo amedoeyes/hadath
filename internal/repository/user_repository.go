@@ -5,6 +5,8 @@ import (
 
 	"github.com/amedoeyes/hadath/internal/database"
 	"github.com/amedoeyes/hadath/internal/model"
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -30,15 +32,8 @@ func (r *UserRepository) Create(ctx context.Context, name, email, password strin
 func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 	query := "SELECT id, name, email, password, created_at, updated_at FROM users WHERE email = $1"
 
-	user := &model.User{}
-	err := r.db.QueryRow(ctx, query, email).Scan(
-		&user.ID,
-		&user.Name,
-		&user.Email,
-		&user.Password,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-	)
+	rows, err := r.db.Query(ctx, query, email)
+	user, err := pgx.CollectExactlyOneRow(rows, pgx.RowToAddrOfStructByName[model.User])
 	if err != nil {
 		return nil, err
 	}
@@ -46,18 +41,11 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*model.U
 	return user, nil
 }
 
-func (r *UserRepository) GetByID(ctx context.Context, id uint32) (*model.User, error) {
+func (r *UserRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
 	query := "SELECT id, name, email, password, created_at, updated_at FROM users WHERE id = $1"
 
-	user := &model.User{}
-	err := r.db.QueryRow(ctx, query, id).Scan(
-		&user.ID,
-		&user.Name,
-		&user.Email,
-		&user.Password,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-	)
+	rows, err := r.db.Query(ctx, query, id)
+	user, err := pgx.CollectExactlyOneRow(rows, pgx.RowToAddrOfStructByName[model.User])
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +71,7 @@ func (r *UserRepository) Update(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-func (r *UserRepository) DeleteByID(ctx context.Context, id uint32) error {
+func (r *UserRepository) DeleteByID(ctx context.Context, id uuid.UUID) error {
 	query := "DELETE FROM users WHERE id = $1"
 
 	_, err := r.db.Exec(ctx, query, id)

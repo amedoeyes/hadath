@@ -3,21 +3,21 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"strconv"
 
 	"github.com/amedoeyes/hadath/internal/repository"
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
 func EventCtx(repo *repository.EventRepository) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			id, err := strconv.ParseUint(chi.URLParam(r, "id"), 10, 32)
+			id, err := uuid.Parse(chi.URLParam(r, "id"))
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			event, err := repo.GetByID(r.Context(), uint32(id))
+			event, err := repo.GetByID(r.Context(), id)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusUnauthorized)
 				return

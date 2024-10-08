@@ -1,8 +1,10 @@
 -- +goose Up
 -- +goose StatementBegin
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE events (
-	id SERIAL PRIMARY KEY,
-	user_id INT REFERENCES users(id) ON DELETE SET NULL,
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	user_id UUID REFERENCES users(id) ON DELETE SET NULL,
 	name VARCHAR(255) NOT NULL,
 	description TEXT,
 	address VARCHAR(255) NOT NULL,

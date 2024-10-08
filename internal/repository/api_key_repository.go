@@ -5,6 +5,7 @@ import (
 
 	"github.com/amedoeyes/hadath/internal/database"
 	"github.com/amedoeyes/hadath/internal/model"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -16,7 +17,7 @@ func NewAPIKeyRepository() *APIKeyRepository {
 	return &APIKeyRepository{database.Get()}
 }
 
-func (r *APIKeyRepository) Create(ctx context.Context, userID uint32, key string) error {
+func (r *APIKeyRepository) Create(ctx context.Context, userID uuid.UUID, key string) error {
 	query := "INSERT INTO api_keys (user_id, key) VALUES ($1, $2)"
 
 	_, err := r.db.Exec(ctx, query, userID, key)
@@ -39,7 +40,7 @@ func (r *APIKeyRepository) GetByKey(ctx context.Context, key string) (*model.API
 	return apiKey, nil
 }
 
-func (r *APIKeyRepository) DeleteByID(ctx context.Context, id uint32) error {
+func (r *APIKeyRepository) DeleteByID(ctx context.Context, id uuid.UUID) error {
 	query := "DELETE FROM api_keys WHERE id = $1"
 
 	_, err := r.db.Exec(ctx, query, id)
