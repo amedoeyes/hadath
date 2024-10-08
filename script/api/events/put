@@ -1,0 +1,13 @@
+#!/bin/bash
+
+ROUTE="events/$1"
+METHOD="PUT"
+DATA=$(
+	cat <<EOF
+{
+	"name": "cat2"
+}
+EOF
+)
+
+source "$(dirname "${BASH_SOURCE[0]}")/../request"

@@ -66,7 +66,6 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	response.APIKey = apiKey
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }
 

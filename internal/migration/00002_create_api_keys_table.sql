@@ -2,9 +2,8 @@
 -- +goose StatementBegin
 CREATE TABLE api_keys (
 	id SERIAL PRIMARY KEY,
-	user_id INTEGER NOT NULL REFERENCES users(id),
-	key VARCHAR(255) NOT NULL,
-	FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+	user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	key VARCHAR(255) NOT NULL
 );
 -- +goose StatementEnd
 

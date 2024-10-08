@@ -14,12 +14,17 @@ func Setup() *chi.Mux {
 
 	apiKeyRepo := repository.NewAPIKeyRepository()
 	userRepo := repository.NewUserRepository()
+	eventRepo := repository.NewEventRepository()
 
 	authService := service.NewAuthService(apiKeyRepo, userRepo)
+	eventService := service.NewEventService(eventRepo)
 
 	authHandler := handler.NewAuthHandler(authService)
+	eventHandler := handler.NewEventHandler(eventService)
 
 	authMiddleware := middleware.Auth(apiKeyRepo)
+	userCtxMiddleware := middleware.UserCtx(userRepo)
+	eventCtxMiddleware := middleware.EventCtx(eventRepo)
 
 	r.Use(chiMiddleware.Logger)
 
@@ -27,6 +32,20 @@ func Setup() *chi.Mux {
 		r.Post("/signup", authHandler.SignUp)
 		r.Post("/signin", authHandler.SignIn)
 		r.With(authMiddleware).Post("/signout", authHandler.SignOut)
+	})
+
+	r.Route("/events", func(r chi.Router) {
+		r.Use(authMiddleware)
+		r.Use(userCtxMiddleware)
+		r.Post("/", eventHandler.Create)
+		r.Get("/", eventHandler.GetAll)
+
+		r.Route("/{id}", func(r chi.Router) {
+			r.Use(eventCtxMiddleware)
+			r.Get("/", eventHandler.GetByID)
+			r.Put("/", eventHandler.UpdateByID)
+			r.Delete("/", eventHandler.DeleteByID)
+		})
 	})
 
 	return r

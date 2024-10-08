@@ -1,6 +1,5 @@
 #!/bin/bash
 
-ROUTE="auth/signout"
-METHOD="POST"
+ROUTE="events"
 
 source "$(dirname "${BASH_SOURCE[0]}")/../request"

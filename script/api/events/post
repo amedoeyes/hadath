@@ -1,0 +1,17 @@
+#!/bin/bash
+
+ROUTE="events/"
+METHOD="POST"
+DATA=$(
+	cat <<EOF
+{
+	"name": "cat",
+	"description": "meow meow meow",
+	"address": "cat central",
+	"start_time": "2000-01-01T00:00:05Z",
+	"end_time": "2000-01-01T23:59:05Z"
+}
+EOF
+)
+
+source "$(dirname "${BASH_SOURCE[0]}")/../request"
