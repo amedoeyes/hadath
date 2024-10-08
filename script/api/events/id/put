@@ -1,0 +1,21 @@
+#!/bin/bash
+
+ROUTE="events/$1"
+METHOD="PUT"
+DATA=$(
+	jq -n \
+		--arg name "$2" \
+		--arg description "$3" \
+		--arg address "$4" \
+		--arg start_time "$5" \
+		--arg end_time "$6" \
+		'{
+	name: $name,
+	description: $description,
+	address: $address,
+	start_time: $start_time,
+	end_time: $end_time
+} | with_entries(select(.value != ""))'
+)
+
+source "$(dirname "${BASH_SOURCE[0]}")/../../request"

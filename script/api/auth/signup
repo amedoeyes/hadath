@@ -3,13 +3,15 @@
 ROUTE="auth/signup"
 METHOD="POST"
 DATA=$(
-	cat <<EOF
-{
-	"name": "cat",
-	"email": "cat@cat.com",
-	"password": "password"
-}
-EOF
+	jq -n \
+		--arg name "$1" \
+		--arg email "$2" \
+		--arg password "$3" \
+		'{
+		name: $name,
+		email: $email,
+		password: $password
+	}'
 )
 
 source "$(dirname "${BASH_SOURCE[0]}")/../request"
