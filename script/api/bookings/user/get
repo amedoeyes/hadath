@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ROUTE="bookings/user"
+
+source "$(dirname "${BASH_SOURCE[0]}")/../../request"
