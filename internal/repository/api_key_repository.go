@@ -18,7 +18,11 @@ func NewAPIKeyRepository() *APIKeyRepository {
 }
 
 func (r *APIKeyRepository) Create(ctx context.Context, userID uuid.UUID, key string) error {
-	query := "INSERT INTO api_keys (user_id, key) VALUES ($1, $2)"
+	query := `
+	INSERT
+	INTO api_keys (user_id, key)
+	VALUES ($1, $2)
+	`
 
 	_, err := r.db.Exec(ctx, query, userID, key)
 	if err != nil {
@@ -29,19 +33,28 @@ func (r *APIKeyRepository) Create(ctx context.Context, userID uuid.UUID, key str
 }
 
 func (r *APIKeyRepository) GetByKey(ctx context.Context, key string) (*model.APIKey, error) {
-	query := "SELECT id, user_id, key FROM api_keys WHERE key = $1"
+	query := `
+	SELECT id, user_id, key
+	FROM api_keys
+	WHERE key = $1
+	`
 
-	apiKey := &model.APIKey{}
-	err := r.db.QueryRow(ctx, query, key).Scan(&apiKey.ID, &apiKey.UserID, &apiKey.Key)
+	rows, err := r.db.Query(ctx, query, key)
 	if err != nil {
 		return nil, err
 	}
+	apiKey := &model.APIKey{}
+	rows.Scan(&apiKey.ID, &apiKey.UserID, &apiKey.Key)
 
 	return apiKey, nil
 }
 
 func (r *APIKeyRepository) DeleteByID(ctx context.Context, id uuid.UUID) error {
-	query := "DELETE FROM api_keys WHERE id = $1"
+	query := `
+	DELETE
+	FROM api_keys
+	WHERE id = $1
+	`
 
 	_, err := r.db.Exec(ctx, query, id)
 	if err != nil {

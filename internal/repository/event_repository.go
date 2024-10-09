@@ -20,7 +20,11 @@ func NewEventRepository() *EventRepository {
 }
 
 func (r *EventRepository) Create(ctx context.Context, user_id uuid.UUID, name, description, address string, startTime, endTime time.Time) error {
-	query := "INSERT INTO events (user_id, name, description, address, start_time, end_time) VALUES ($1, $2, $3, $4, $5, $6)"
+	query := `
+	INSERT
+	INTO events (user_id, name, description, address, start_time, end_time) 
+	VALUES ($1, $2, $3, $4, $5, $6)
+	`
 
 	_, err := r.db.Exec(ctx, query, user_id, name, description, address, startTime, endTime)
 	if err != nil {
@@ -31,23 +35,45 @@ func (r *EventRepository) Create(ctx context.Context, user_id uuid.UUID, name, d
 }
 
 func (r *EventRepository) GetAll(ctx context.Context) ([]model.Event, error) {
-	query := "SELECT * FROM events"
+	query := `
+	SELECT id, user_id, name, description, address, start_time, end_time, created_at, updated_at
+	FROM events
+	`
 
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.Event])
-	if err != nil {
-		return nil, err
+	var events []model.Event
+	for rows.Next() {
+		var event model.Event
+		err := rows.Scan(
+			&event.ID,
+			&event.UserID,
+			&event.Name,
+			&event.Description,
+			&event.Address,
+			&event.StartTime,
+			&event.EndTime,
+			&event.CreatedAt,
+			&event.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, event)
 	}
 
 	return events, nil
 }
 
 func (r *EventRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Event, error) {
-	query := "SELECT * FROM events WHERE id = $1"
+	query := `
+	SELECT id, user_id, name, description, address, start_time, end_time, created_at, updated_at
+	FROM events
+	WHERE id = $1
+	`
 
 	rows, err := r.db.Query(ctx, query, id)
 	event, err := pgx.CollectExactlyOneRow(rows, pgx.RowToAddrOfStructByName[model.Event])
@@ -59,7 +85,11 @@ func (r *EventRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Eve
 }
 
 func (r *EventRepository) UpdateByID(ctx context.Context, id uuid.UUID, name, description, address string, startTime, endTime time.Time) error {
-	query := "UPDATE events SET name = $1, description = $2, address = $3, start_time = $4, end_time = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6"
+	query := `
+	UPDATE events
+	SET name = $1, description = $2, address = $3, start_time = $4, end_time = $5, updated_at = CURRENT_TIMESTAMP
+	WHERE id = $6
+	`
 
 	_, err := r.db.Exec(ctx, query, name, description, address, startTime, endTime, id)
 	if err != nil {
@@ -70,7 +100,11 @@ func (r *EventRepository) UpdateByID(ctx context.Context, id uuid.UUID, name, de
 }
 
 func (r *EventRepository) DeleteByID(ctx context.Context, id uuid.UUID) error {
-	query := "DELETE FROM events WHERE id = $1"
+	query := `
+	DELETE
+	FROM events
+	WHERE id = $1
+	`
 
 	_, err := r.db.Exec(ctx, query, id)
 	if err != nil {
