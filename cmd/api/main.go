@@ -9,6 +9,7 @@ import (
 	"github.com/amedoeyes/hadath/config"
 	"github.com/amedoeyes/hadath/internal/database"
 	"github.com/amedoeyes/hadath/internal/router"
+	"github.com/amedoeyes/hadath/internal/validator"
 )
 
 func main() {
@@ -19,6 +20,7 @@ func main() {
 		return
 	}
 	defer database.Disconnect()
+	validator.Init()
 
 	cfg := config.Get()
 	addr := fmt.Sprintf("%s:%d", cfg.ServerHost(), cfg.ServerPort())
