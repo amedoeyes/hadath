@@ -46,8 +46,8 @@ func Setup() *chi.Mux {
 		r.Route("/{id}", func(r chi.Router) {
 			r.Use(eventCtxMiddleware)
 			r.Get("/", eventHandler.Get)
-			r.Put("/", eventHandler.Update)
-			r.Delete("/", eventHandler.Delete)
+			r.With(currentUserCtxMiddleware).Put("/", eventHandler.Update)
+			r.With(currentUserCtxMiddleware).Delete("/", eventHandler.Delete)
 		})
 	})
 

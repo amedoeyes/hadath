@@ -24,7 +24,9 @@ func (s *BookingService) Create(ctx context.Context, req *dto.BookingRequest) er
 	if err != nil {
 		return err
 	}
+
 	user := ctx.Value("user").(*model.User)
+
 	return s.repo.Create(ctx, user.ID, req.EventID)
 }
 
@@ -63,6 +65,8 @@ func (s *BookingService) Delete(ctx context.Context, req *dto.BookingRequest) er
 	if err != nil {
 		return err
 	}
+
 	user := ctx.Value("user").(*model.User)
+
 	return s.repo.Delete(ctx, user.ID, req.EventID)
 }
