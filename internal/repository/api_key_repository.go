@@ -39,17 +39,16 @@ func (r *APIKeyRepository) GetByKey(ctx context.Context, key string) (*model.API
 	WHERE key = $1
 	`
 
-	rows, err := r.db.Query(ctx, query, key)
+	apiKey := &model.APIKey{}
+	err := r.db.QueryRow(ctx, query, key).Scan(&apiKey.ID, &apiKey.UserID, &apiKey.Key)
 	if err != nil {
 		return nil, err
 	}
-	apiKey := &model.APIKey{}
-	rows.Scan(&apiKey.ID, &apiKey.UserID, &apiKey.Key)
 
 	return apiKey, nil
 }
 
-func (r *APIKeyRepository) DeleteByID(ctx context.Context, id uuid.UUID) error {
+func (r *APIKeyRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	query := `
 	DELETE
 	FROM api_keys

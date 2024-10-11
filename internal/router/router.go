@@ -26,7 +26,7 @@ func Setup() *chi.Mux {
 	bookingHandler := handler.NewBookingHandler(bookingService)
 
 	authMiddleware := middleware.Auth(apiKeyRepo)
-	userCtxMiddleware := middleware.UserCtx(userRepo)
+	currentUserCtxMiddleware := middleware.CurrentUserCtx(userRepo)
 	eventCtxMiddleware := middleware.EventCtx(eventRepo)
 
 	r.Use(chiMiddleware.Logger)
@@ -40,14 +40,14 @@ func Setup() *chi.Mux {
 	r.Route("/events", func(r chi.Router) {
 		r.Use(authMiddleware)
 
-		r.With(userCtxMiddleware).Post("/", eventHandler.Create)
-		r.Get("/", eventHandler.GetAll)
+		r.With(currentUserCtxMiddleware).Post("/", eventHandler.Create)
+		r.Get("/", eventHandler.List)
 
 		r.Route("/{id}", func(r chi.Router) {
 			r.Use(eventCtxMiddleware)
-			r.Get("/", eventHandler.GetByID)
-			r.Put("/", eventHandler.UpdateByID)
-			r.Delete("/", eventHandler.DeleteByID)
+			r.Get("/", eventHandler.Get)
+			r.Put("/", eventHandler.Update)
+			r.Delete("/", eventHandler.Delete)
 		})
 	})
 
@@ -55,13 +55,13 @@ func Setup() *chi.Mux {
 		r.Use(authMiddleware)
 
 		r.Route("/user", func(r chi.Router) {
-			r.Use(userCtxMiddleware)
+			r.Use(currentUserCtxMiddleware)
 			r.Post("/", bookingHandler.Create)
-			r.Get("/", bookingHandler.GetAllByUserID)
+			r.Get("/", bookingHandler.ListByCurrentUser)
+			r.Delete("/", bookingHandler.Delete)
 		})
 
-		r.With(eventCtxMiddleware).Get("/event/{id}", bookingHandler.GetAllByEventID)
-		r.Delete("/{id}", bookingHandler.DeleteByID)
+		r.With(eventCtxMiddleware).Get("/event/{id}", bookingHandler.ListByEvent)
 	})
 
 	return r

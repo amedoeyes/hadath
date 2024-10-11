@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/amedoeyes/hadath/internal/model"
+	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/amedoeyes/hadath/internal/service"
-	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 )
 
 type BookingHandler struct {
@@ -21,18 +19,14 @@ func NewBookingHandler(service *service.BookingService) *BookingHandler {
 }
 
 func (h *BookingHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var request struct {
-		EventID uuid.UUID `json:"event_id"`
-	}
+	var request dto.BookingRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	user := r.Context().Value("user").(*model.User)
-
-	err = h.service.Create(r.Context(), user.ID, request.EventID)
+	err = h.service.Create(r.Context(), &request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -41,10 +35,8 @@ func (h *BookingHandler) Create(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *BookingHandler) GetAllByUserID(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value("user").(*model.User)
-
-	bookings, err := h.service.GetAllByUserID(r.Context(), user.ID)
+func (h *BookingHandler) ListByCurrentUser(w http.ResponseWriter, r *http.Request) {
+	bookings, err := h.service.ListByCurrentUser(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -54,10 +46,8 @@ func (h *BookingHandler) GetAllByUserID(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(bookings)
 }
 
-func (h *BookingHandler) GetAllByEventID(w http.ResponseWriter, r *http.Request) {
-	event := r.Context().Value("event").(*model.Event)
-
-	bookings, err := h.service.GetAllByEventID(r.Context(), event.ID)
+func (h *BookingHandler) ListByEvent(w http.ResponseWriter, r *http.Request) {
+	bookings, err := h.service.ListByEvent(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -67,14 +57,15 @@ func (h *BookingHandler) GetAllByEventID(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(bookings)
 }
 
-func (h *BookingHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
-	id, err := uuid.Parse(chi.URLParam(r, "id"))
+func (h *BookingHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	var request dto.BookingRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = h.service.DeleteByID(r.Context(), id)
+	err = h.service.Delete(r.Context(), &request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -1,4 +1,4 @@
-package utility
+package service
 
 import (
 	"crypto/rand"

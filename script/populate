@@ -1,0 +1,75 @@
+#!/bin/bash
+
+SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+
+generate_user_name() {
+	first_names=("John" "Jane" "Alex" "Emily" "Chris" "Katie" "Michael" "Sarah" "David" "Laura")
+	last_names=("Smith" "Johnson" "Williams" "Jones" "Brown" "Davis" "Miller" "Wilson" "Moore" "Taylor")
+
+	first="${first_names[$RANDOM % ${#first_names[@]}]}"
+	last="${last_names[$RANDOM % ${#last_names[@]}]}"
+	echo "$first $last"
+}
+
+generate_user_email() {
+	domains=("example.com" "test.com" "sample.com" "demo.com")
+	name=$(echo "$1" | tr ' ' '.' | tr '[:upper:]' '[:lower:]')
+	domain="${domains[$RANDOM % ${#domains[@]}]}"
+	echo "$name@$domain"
+}
+
+generate_user_password() {
+	length=12
+	openssl rand -base64 48 | tr -dc 'A-Za-z0-9!@#$%^&*()_+=' | head -c "$length"
+	echo
+}
+
+generate_event_address() {
+	streets=("123 Main St" "456 Oak St" "789 Pine St" "101 Maple Ave" "202 Elm St")
+	cities=("Springfield" "Rivertown" "Hill Valley" "Metropolis" "Gotham City")
+	states=("CA" "NY" "TX" "FL" "IL")
+
+	street="${streets[$RANDOM % ${#streets[@]}]}"
+	city="${cities[$RANDOM % ${#cities[@]}]}"
+	state="${states[$RANDOM % ${#states[@]}]}"
+	echo "$street, $city, $state"
+}
+
+generate_event_name() {
+	event_names=("Annual Tech Conference" "Community BBQ" "Yoga Class" "Book Fair" "Art Exhibition" "Music Festival" "Sports Day" "Charity Run" "Science Workshop" "Food Truck Rally")
+	echo "${event_names[$RANDOM % ${#event_names[@]}]}"
+}
+
+generate_event_description() {
+	descriptions=("Join us for a day of tech talks!" "A community gathering with food and fun." "Relax and stretch with our yoga class." "Explore new books and meet authors." "Experience local art in our exhibition." "Enjoy live music from various artists." "Compete in friendly sports activities." "Run for a cause!" "Hands-on science experiments for all ages." "Taste delicious food from local trucks.")
+	echo "${descriptions[$RANDOM % ${#descriptions[@]}]}"
+}
+
+generate_event_times() {
+	start_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ" --date="$((RANDOM % 30)) days")
+	end_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ" --date="$start_time + 2 hours")
+	echo "$start_time $end_time"
+}
+
+populate_users() {
+	for ((i = 0; i < 100; i++)); do
+		name=$(generate_user_name)
+		email=$(generate_user_email "$name")
+		password=$(generate_user_password)
+		"$SCRIPT_DIR"/api/auth/signup "$name" "$email" "$password"
+	done
+}
+
+populate_events() {
+	for ((i = 0; i < 100; i++)); do
+		name=$(generate_event_name)
+		description=$(generate_event_description)
+		address=$(generate_event_address)
+		read -r start_time end_time < <(generate_event_times)
+
+		"$SCRIPT_DIR"/api/events/post "$name" "$description" "$address" "$start_time" "$end_time"
+	done
+}
+
+populate_users
+populate_events

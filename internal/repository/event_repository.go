@@ -7,7 +7,6 @@ import (
 	"github.com/amedoeyes/hadath/internal/database"
 	"github.com/amedoeyes/hadath/internal/model"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -34,30 +33,39 @@ func (r *EventRepository) Create(ctx context.Context, user_id uuid.UUID, name, d
 	return nil
 }
 
-func (r *EventRepository) GetAll(ctx context.Context) ([]model.Event, error) {
+func (r *EventRepository) List(ctx context.Context) ([]model.Event, error) {
 	query := `
-	SELECT id, user_id, name, description, address, start_time, end_time, created_at, updated_at
+	SELECT 
+		events.id AS event_id,
+		events.name AS event_name,
+		events.description AS event_description,
+		events.address AS event_address,
+		events.start_time AS event_start_time,
+		events.end_time AS event_end_time,
+		user_id,
+		users.name AS user_name
 	FROM events
+	JOIN users ON events.user_id = users.id
 	`
 
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var events []model.Event
 	for rows.Next() {
 		var event model.Event
 		err := rows.Scan(
 			&event.ID,
-			&event.UserID,
 			&event.Name,
 			&event.Description,
 			&event.Address,
 			&event.StartTime,
 			&event.EndTime,
-			&event.CreatedAt,
-			&event.UpdatedAt,
+			&event.User.ID,
+			&event.User.Name,
 		)
 		if err != nil {
 			return nil, err
@@ -68,15 +76,33 @@ func (r *EventRepository) GetAll(ctx context.Context) ([]model.Event, error) {
 	return events, nil
 }
 
-func (r *EventRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Event, error) {
+func (r *EventRepository) Get(ctx context.Context, id uuid.UUID) (*model.Event, error) {
 	query := `
-	SELECT id, user_id, name, description, address, start_time, end_time, created_at, updated_at
+	SELECT 
+		events.id AS event_id,
+		events.name AS event_name,
+		events.description AS event_description,
+		events.address AS event_address,
+		events.start_time AS event_start_time,
+		events.end_time AS event_end_time,
+		user_id,
+		users.name AS user_name
 	FROM events
-	WHERE id = $1
+	JOIN users ON events.user_id = users.id
+	WHERE events.id = $1
 	`
 
-	rows, err := r.db.Query(ctx, query, id)
-	event, err := pgx.CollectExactlyOneRow(rows, pgx.RowToAddrOfStructByName[model.Event])
+	event := &model.Event{}
+	err := r.db.QueryRow(ctx, query, id).Scan(
+		&event.ID,
+		&event.Name,
+		&event.Description,
+		&event.Address,
+		&event.StartTime,
+		&event.EndTime,
+		&event.User.ID,
+		&event.User.Name,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +110,7 @@ func (r *EventRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Eve
 	return event, nil
 }
 
-func (r *EventRepository) UpdateByID(ctx context.Context, id uuid.UUID, name, description, address string, startTime, endTime time.Time) error {
+func (r *EventRepository) Update(ctx context.Context, id uuid.UUID, name, description, address string, startTime, endTime time.Time) error {
 	query := `
 	UPDATE events
 	SET name = $1, description = $2, address = $3, start_time = $4, end_time = $5, updated_at = CURRENT_TIMESTAMP
@@ -99,7 +125,7 @@ func (r *EventRepository) UpdateByID(ctx context.Context, id uuid.UUID, name, de
 	return nil
 }
 
-func (r *EventRepository) DeleteByID(ctx context.Context, id uuid.UUID) error {
+func (r *EventRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	query := `
 	DELETE
 	FROM events

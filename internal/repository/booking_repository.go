@@ -32,11 +32,21 @@ func (r *BookingRepository) Create(ctx context.Context, userID, eventID uuid.UUI
 	return nil
 }
 
-func (r *BookingRepository) GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]model.Booking, error) {
+func (r *BookingRepository) ListByUser(ctx context.Context, userID uuid.UUID) ([]model.Event, error) {
 	query := `
-	SELECT id, user_id, event_id
+	SELECT
+		event_id,
+		events.name,
+		events.description,
+		events.address,
+		events.start_time,
+		events.end_time,
+		users.id AS user_id,
+		users.name AS user_name
 	FROM bookings
-	WHERE user_id = $1
+	JOIN events ON events.id = bookings.event_id
+	JOIN users ON users.id = events.user_id
+	WHERE bookings.user_id = $1
 	`
 
 	rows, err := r.db.Query(ctx, query, userID)
@@ -44,24 +54,36 @@ func (r *BookingRepository) GetAllByUserID(ctx context.Context, userID uuid.UUID
 		return nil, err
 	}
 
-	var bookings []model.Booking
+	var events []model.Event
 	for rows.Next() {
-		var booking model.Booking
-		err := rows.Scan(&booking.ID, &booking.UserID, &booking.EventID)
+		var event model.Event
+		err := rows.Scan(
+			&event.ID,
+			&event.Name,
+			&event.Description,
+			&event.Address,
+			&event.StartTime,
+			&event.EndTime,
+			&event.User.ID,
+			&event.User.Name,
+		)
 		if err != nil {
 			return nil, err
 		}
-		bookings = append(bookings, booking)
+		events = append(events, event)
 	}
 
-	return bookings, nil
+	return events, nil
 }
 
-func (r *BookingRepository) GetAllByEventID(ctx context.Context, eventID uuid.UUID) ([]model.Booking, error) {
+func (r *BookingRepository) ListByEvent(ctx context.Context, eventID uuid.UUID) ([]model.User, error) {
 	query := `
-	SELECT id, user_id, event_id
+	SELECT
+		user_id,
+		users.name AS user_name
 	FROM bookings
-	WHERE event_id = $1
+	JOIN users ON users.id = bookings.user_id
+	WHERE bookings.event_id = $1
 	`
 
 	rows, err := r.db.Query(ctx, query, eventID)
@@ -69,27 +91,30 @@ func (r *BookingRepository) GetAllByEventID(ctx context.Context, eventID uuid.UU
 		return nil, err
 	}
 
-	var bookings []model.Booking
+	var users []model.User
 	for rows.Next() {
-		var booking model.Booking
-		err := rows.Scan(&booking.ID, &booking.UserID, &booking.EventID)
+		var user model.User
+		err := rows.Scan(
+			&user.ID,
+			&user.Name,
+		)
 		if err != nil {
 			return nil, err
 		}
-		bookings = append(bookings, booking)
+		users = append(users, user)
 	}
 
-	return bookings, nil
+	return users, nil
 }
 
-func (r *BookingRepository) DeleteByID(ctx context.Context, id uuid.UUID) error {
+func (r *BookingRepository) Delete(ctx context.Context, userID, eventID uuid.UUID) error {
 	query := `
 	DELETE 
 	FROM bookings
-	WHERE id = $1
+	WHERE user_id = $1 AND event_id = $2
 	`
 
-	_, err := r.db.Exec(ctx, query, id)
+	_, err := r.db.Exec(ctx, query, userID, eventID)
 	if err != nil {
 		return err
 	}

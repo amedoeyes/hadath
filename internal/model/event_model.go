@@ -3,17 +3,28 @@ package model
 import (
 	"time"
 
+	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/google/uuid"
 )
 
 type Event struct {
-	ID          uuid.UUID `json:"id"`
-	UserID      uuid.UUID `json:"user_id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Address     string    `json:"address"`
-	StartTime   time.Time `json:"start_time"`
-	EndTime     time.Time `json:"end_time"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          uuid.UUID
+	User        User
+	Name        string
+	Description string
+	Address     string
+	StartTime   time.Time
+	EndTime     time.Time
+}
+
+func (e *Event) ToResponse() dto.EventResponse {
+	return dto.EventResponse{
+		ID:          e.ID,
+		User:        e.User.ToResponse(),
+		Name:        e.Name,
+		Description: e.Description,
+		Address:     e.Address,
+		StartTime:   e.StartTime,
+		EndTime:     e.EndTime,
+	}
 }

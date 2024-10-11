@@ -2,11 +2,11 @@ package service
 
 import (
 	"context"
-	"time"
 
+	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/amedoeyes/hadath/internal/model"
 	"github.com/amedoeyes/hadath/internal/repository"
-	"github.com/google/uuid"
+	"github.com/amedoeyes/hadath/internal/validator"
 )
 
 type EventService struct {
@@ -19,22 +19,64 @@ func NewEventService(repo *repository.EventRepository) *EventService {
 	}
 }
 
-func (s *EventService) Create(ctx context.Context, user_id uuid.UUID, name, description, address string, startTime, endTime time.Time) error {
-	return s.repo.Create(ctx, user_id, name, description, address, startTime, endTime)
+func (s *EventService) Create(ctx context.Context, req *dto.EventRequest) error {
+	err := validator.Get().Struct(req)
+	if err != nil {
+		return err
+	}
+
+	user := ctx.Value("user").(*model.User)
+
+	return s.repo.Create(
+		ctx,
+		user.ID,
+		req.Name,
+		req.Description,
+		req.Address,
+		req.StartTime,
+		req.EndTime,
+	)
 }
 
-func (s *EventService) GetAll(ctx context.Context) ([]model.Event, error) {
-	return s.repo.GetAll(ctx)
+func (s *EventService) List(ctx context.Context) ([]dto.EventResponse, error) {
+	events, err := s.repo.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make([]dto.EventResponse, 0, len(events))
+	for _, event := range events {
+		response = append(response, event.ToResponse())
+	}
+
+	return response, nil
 }
 
-func (s *EventService) GetByID(ctx context.Context, id uuid.UUID) (*model.Event, error) {
-	return s.repo.GetByID(ctx, id)
+func (s *EventService) Get(ctx context.Context) dto.EventResponse {
+	event := ctx.Value("event").(*model.Event)
+	return event.ToResponse()
 }
 
-func (s *EventService) UpdateByID(ctx context.Context, id uuid.UUID, name, description, address string, startTime, endTime time.Time) error {
-	return s.repo.UpdateByID(ctx, id, name, description, address, startTime, endTime)
+func (s *EventService) Update(ctx context.Context, req *dto.EventRequest) error {
+	err := validator.Get().Struct(req)
+	if err != nil {
+		return err
+	}
+
+	event := ctx.Value("event").(*model.Event)
+
+	return s.repo.Update(
+		ctx,
+		event.ID,
+		req.Name,
+		req.Description,
+		req.Address,
+		req.StartTime,
+		req.EndTime,
+	)
 }
 
-func (s *EventService) DeleteByID(ctx context.Context, id uuid.UUID) error {
-	return s.repo.DeleteByID(ctx, id)
+func (s *EventService) Delete(ctx context.Context) error {
+	event := ctx.Value("event").(*model.Event)
+	return s.repo.Delete(ctx, event.ID)
 }

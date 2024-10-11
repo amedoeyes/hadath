@@ -32,36 +32,34 @@ func (r *UserRepository) Create(ctx context.Context, name, email, password strin
 	return nil
 }
 
-func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+func (r *UserRepository) Get(ctx context.Context, id uuid.UUID) (*model.User, error) {
 	query := `
-	SELECT id, name, email, created_at, updated_at
-	FROM users
-	WHERE email = $1
-	`
-
-	rows, err := r.db.Query(ctx, query, email)
-	if err != nil {
-		return nil, err
-	}
-	user := &model.User{}
-	rows.Scan(&user.ID, &user.Email, &user.CreatedAt, &user.UpdatedAt)
-
-	return user, nil
-}
-
-func (r *UserRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
-	query := `
-	SELECT id, name, email, created_at, updated_at
+	SELECT id, name, email, password
 	FROM users
 	WHERE id = $1
 	`
 
-	rows, err := r.db.Query(ctx, query, id)
+	user := &model.User{}
+	err := r.db.QueryRow(ctx, query, id).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
 	if err != nil {
 		return nil, err
 	}
+
+	return user, nil
+}
+
+func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	query := `
+	SELECT id, name, email, password
+	FROM users
+	WHERE email = $1
+	`
+
 	user := &model.User{}
-	rows.Scan(&user.ID, &user.Email, &user.CreatedAt, &user.UpdatedAt)
+	err := r.db.QueryRow(ctx, query, email).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	if err != nil {
+		return nil, err
+	}
 
 	return user, nil
 }
@@ -81,7 +79,7 @@ func (r *UserRepository) Update(ctx context.Context, id uuid.UUID, name, email, 
 	return nil
 }
 
-func (r *UserRepository) DeleteByID(ctx context.Context, id uuid.UUID) error {
+func (r *UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	query := `
 	DELETE
 	FROM users

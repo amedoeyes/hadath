@@ -1,16 +1,20 @@
 package model
 
 import (
-	"time"
-
+	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/google/uuid"
 )
 
 type User struct {
-	ID        uuid.UUID `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID       uuid.UUID
+	Name     string
+	Email    string
+	Password string
+}
+
+func (u *User) ToResponse() dto.UserResponse {
+	return dto.UserResponse{
+		ID:   u.ID,
+		Name: u.Name,
+	}
 }

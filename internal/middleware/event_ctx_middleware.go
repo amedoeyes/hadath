@@ -17,7 +17,7 @@ func EventCtx(repo *repository.EventRepository) func(next http.Handler) http.Han
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			event, err := repo.GetByID(r.Context(), id)
+			event, err := repo.Get(r.Context(), id)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusUnauthorized)
 				return

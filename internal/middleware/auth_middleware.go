@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/amedoeyes/hadath/internal/repository"
-	"github.com/amedoeyes/hadath/internal/utility"
+	"github.com/amedoeyes/hadath/internal/service"
 )
 
 func Auth(repo *repository.APIKeyRepository) func(next http.Handler) http.Handler {
@@ -19,7 +19,7 @@ func Auth(repo *repository.APIKeyRepository) func(next http.Handler) http.Handle
 			}
 			key := strings.TrimPrefix(authHeader, "Bearer ")
 
-			apiKey, err := repo.GetByKey(r.Context(), utility.HashAPIKey(key))
+			apiKey, err := repo.GetByKey(r.Context(), service.HashAPIKey(key))
 			if err != nil {
 				http.Error(w, "invalid API key", http.StatusUnauthorized)
 				return

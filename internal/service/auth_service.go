@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 
+	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/amedoeyes/hadath/internal/model"
 	"github.com/amedoeyes/hadath/internal/repository"
-	"github.com/amedoeyes/hadath/internal/utility"
-	"github.com/google/uuid"
+	"github.com/amedoeyes/hadath/internal/validator"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,13 +22,18 @@ func NewAuthService(apiKeyRepo *repository.APIKeyRepository, userRepo *repositor
 	}
 }
 
-func (s *AuthService) SignUp(ctx context.Context, name, email, password string) error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func (s *AuthService) SignUp(ctx context.Context, req *dto.AuthSignUpRequest) error {
+	err := validator.Get().Struct(req)
 	if err != nil {
 		return err
 	}
 
-	err = s.userRepo.Create(ctx, name, email, string(hashedPassword))
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	err = s.userRepo.Create(ctx, req.Name, req.Email, string(hashedPassword))
 	if err != nil {
 		return err
 	}
@@ -36,30 +41,43 @@ func (s *AuthService) SignUp(ctx context.Context, name, email, password string) 
 	return nil
 }
 
-func (s *AuthService) SignIn(ctx context.Context, email, password string) (*model.User, string, error) {
-	user, err := s.userRepo.GetByEmail(ctx, email)
+func (s *AuthService) SignIn(ctx context.Context, req *dto.AuthSignInRequest) (*dto.AuthResponse, error) {
+	err := validator.Get().Struct(req)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	user, err := s.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
-	apiKey, err := utility.GenerateAPIKey()
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
-	err = s.apiKeyRepo.Create(ctx, user.ID, utility.HashAPIKey(apiKey))
+	key, err := GenerateAPIKey()
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
-	return user, apiKey, err
+	err = s.apiKeyRepo.Create(ctx, user.ID, HashAPIKey(key))
+	if err != nil {
+		return nil, err
+	}
+
+	response := &dto.AuthResponse{
+		ID:     user.ID,
+		Name:   user.Name,
+		Email:  user.Email,
+		APIKey: key,
+	}
+
+	return response, err
 }
 
-func (s *AuthService) SignOut(ctx context.Context, id uuid.UUID) error {
-	return s.apiKeyRepo.DeleteByID(ctx, id)
+func (s *AuthService) SignOut(ctx context.Context) error {
+	apiKey := ctx.Value("apiKey").(*model.APIKey)
+	return s.apiKeyRepo.Delete(ctx, apiKey.ID)
 }

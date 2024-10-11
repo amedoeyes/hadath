@@ -1,6 +1,0 @@
-#!/bin/bash
-
-ROUTE="bookings/$1"
-METHOD="DELETE"
-
-source "$(dirname "${BASH_SOURCE[0]}")/../../request"
