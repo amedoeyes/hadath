@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/amedoeyes/hadath/internal/api/response"
 	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/amedoeyes/hadath/internal/service"
 )
@@ -19,15 +20,16 @@ func NewEventHandler(service *service.EventService) *EventHandler {
 }
 
 func (h *EventHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var request dto.EventRequest
-	err := json.NewDecoder(r.Body).Decode(&request)
+	var req dto.EventRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.HandleError(w, err)
+		return
 	}
 
-	err = h.service.Create(r.Context(), &request)
+	err = h.service.Create(r.Context(), &req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 
@@ -37,7 +39,7 @@ func (h *EventHandler) Create(w http.ResponseWriter, r *http.Request) {
 func (h *EventHandler) List(w http.ResponseWriter, r *http.Request) {
 	events, err := h.service.List(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 
@@ -52,15 +54,16 @@ func (h *EventHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *EventHandler) Update(w http.ResponseWriter, r *http.Request) {
-	var request dto.EventRequest
-	err := json.NewDecoder(r.Body).Decode(&request)
+	var req dto.EventRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.HandleError(w, err)
+		return
 	}
 
-	err = h.service.Update(r.Context(), &request)
+	err = h.service.Update(r.Context(), &req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 }
@@ -68,7 +71,7 @@ func (h *EventHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *EventHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	err := h.service.Delete(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 

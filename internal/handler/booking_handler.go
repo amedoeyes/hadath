@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/amedoeyes/hadath/internal/api/response"
 	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/amedoeyes/hadath/internal/service"
 )
@@ -22,13 +23,13 @@ func (h *BookingHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var request dto.BookingRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.HandleError(w, err)
 		return
 	}
 
 	err = h.service.Create(r.Context(), &request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 
@@ -38,7 +39,7 @@ func (h *BookingHandler) Create(w http.ResponseWriter, r *http.Request) {
 func (h *BookingHandler) ListByCurrentUser(w http.ResponseWriter, r *http.Request) {
 	bookings, err := h.service.ListByCurrentUser(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 
@@ -49,7 +50,7 @@ func (h *BookingHandler) ListByCurrentUser(w http.ResponseWriter, r *http.Reques
 func (h *BookingHandler) ListByEvent(w http.ResponseWriter, r *http.Request) {
 	bookings, err := h.service.ListByEvent(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 
@@ -61,13 +62,13 @@ func (h *BookingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	var request dto.BookingRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.HandleError(w, err)
 		return
 	}
 
 	err = h.service.Delete(r.Context(), &request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 

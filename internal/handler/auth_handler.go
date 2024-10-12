@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/amedoeyes/hadath/internal/api/response"
 	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/amedoeyes/hadath/internal/service"
 )
@@ -19,16 +20,16 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
-	var request dto.AuthSignUpRequest
-	err := json.NewDecoder(r.Body).Decode(&request)
+	var req dto.AuthSignUpRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.HandleError(w, err)
 		return
 	}
 
-	err = h.service.SignUp(r.Context(), &request)
+	err = h.service.SignUp(r.Context(), &req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.HandleError(w, err)
 		return
 	}
 
@@ -36,27 +37,26 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
-	var request dto.AuthSignInRequest
-	err := json.NewDecoder(r.Body).Decode(&request)
+	var req dto.AuthSignInRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.HandleError(w, err)
 		return
 	}
 
-	response, err := h.service.SignIn(r.Context(), &request)
+	res, err := h.service.SignIn(r.Context(), &req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	response.WriteJSON(w, http.StatusOK, res)
 }
 
 func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	err := h.service.SignOut(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 

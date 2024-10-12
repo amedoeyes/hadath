@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/amedoeyes/hadath/internal/api/response"
 	"github.com/amedoeyes/hadath/internal/repository"
 	"github.com/amedoeyes/hadath/internal/service"
 )
@@ -14,14 +15,14 @@ func Auth(repo *repository.APIKeyRepository) func(next http.Handler) http.Handle
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-				http.Error(w, "missing or invalid Authorization header", http.StatusUnauthorized)
+				response.WriteJSONError(w, http.StatusUnauthorized, "Invalid API key", nil)
 				return
 			}
 			key := strings.TrimPrefix(authHeader, "Bearer ")
 
 			apiKey, err := repo.GetByKey(r.Context(), service.HashAPIKey(key))
 			if err != nil {
-				http.Error(w, "invalid API key", http.StatusUnauthorized)
+				response.WriteJSONError(w, http.StatusUnauthorized, "Invalid API key", nil)
 				return
 			}
 

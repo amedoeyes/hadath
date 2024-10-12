@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"errors"
 
+	"github.com/amedoeyes/hadath/internal/api"
 	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/amedoeyes/hadath/internal/model"
 	"github.com/amedoeyes/hadath/internal/repository"
@@ -68,7 +68,7 @@ func (s *EventService) Update(ctx context.Context, req *dto.EventRequest) error 
 	event := ctx.Value("event").(*model.Event)
 
 	if event.User.ID != user.ID {
-		return errors.New("Unauthorized")
+		return api.ErrUnauthorized
 	}
 
 	return s.repo.Update(
@@ -87,7 +87,7 @@ func (s *EventService) Delete(ctx context.Context) error {
 	event := ctx.Value("event").(*model.Event)
 
 	if event.User.ID != user.ID {
-		return errors.New("Unauthorized")
+		return api.ErrUnauthorized
 	}
 
 	return s.repo.Delete(ctx, event.ID)
