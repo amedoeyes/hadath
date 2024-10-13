@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/amedoeyes/hadath/internal/api/response"
-	"github.com/amedoeyes/hadath/internal/repository"
+	"github.com/amedoeyes/hadath/internal/database/repository"
 	"github.com/amedoeyes/hadath/internal/service"
 )
 

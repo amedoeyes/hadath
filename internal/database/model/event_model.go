@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/amedoeyes/hadath/internal/dto"
+	"github.com/amedoeyes/hadath/internal/api/response"
 	"github.com/google/uuid"
 )
 
@@ -17,8 +17,8 @@ type Event struct {
 	EndTime     time.Time
 }
 
-func (e *Event) ToResponse() dto.EventResponse {
-	return dto.EventResponse{
+func (e *Event) ToResponse() response.EventResponse {
+	return response.EventResponse{
 		ID:          e.ID,
 		User:        e.User.ToResponse(),
 		Name:        e.Name,

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/amedoeyes/hadath/internal/api/response"
-	"github.com/amedoeyes/hadath/internal/repository"
+	"github.com/amedoeyes/hadath/internal/database/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )

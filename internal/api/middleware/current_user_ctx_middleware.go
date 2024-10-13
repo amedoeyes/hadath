@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/amedoeyes/hadath/internal/model"
-	"github.com/amedoeyes/hadath/internal/repository"
+	"github.com/amedoeyes/hadath/internal/database/model"
+	"github.com/amedoeyes/hadath/internal/database/repository"
 )
 
 func CurrentUserCtx(repo *repository.UserRepository) func(next http.Handler) http.Handler {

@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"github.com/amedoeyes/hadath/internal/api"
-	"github.com/amedoeyes/hadath/internal/dto"
-	"github.com/amedoeyes/hadath/internal/model"
-	"github.com/amedoeyes/hadath/internal/repository"
+	"github.com/amedoeyes/hadath/internal/api/request"
+	"github.com/amedoeyes/hadath/internal/api/response"
+	"github.com/amedoeyes/hadath/internal/database/model"
+	"github.com/amedoeyes/hadath/internal/database/repository"
 	"github.com/amedoeyes/hadath/internal/validator"
 )
 
@@ -20,7 +21,7 @@ func NewEventService(repo *repository.EventRepository) *EventService {
 	}
 }
 
-func (s *EventService) Create(ctx context.Context, req *dto.EventRequest) error {
+func (s *EventService) Create(ctx context.Context, req *request.EventRequest) error {
 	err := validator.Get().Struct(req)
 	if err != nil {
 		return err
@@ -39,13 +40,13 @@ func (s *EventService) Create(ctx context.Context, req *dto.EventRequest) error 
 	)
 }
 
-func (s *EventService) List(ctx context.Context) ([]dto.EventResponse, error) {
+func (s *EventService) List(ctx context.Context) ([]response.EventResponse, error) {
 	events, err := s.repo.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	response := make([]dto.EventResponse, 0, len(events))
+	response := make([]response.EventResponse, 0, len(events))
 	for _, event := range events {
 		response = append(response, event.ToResponse())
 	}
@@ -53,12 +54,12 @@ func (s *EventService) List(ctx context.Context) ([]dto.EventResponse, error) {
 	return response, nil
 }
 
-func (s *EventService) Get(ctx context.Context) dto.EventResponse {
+func (s *EventService) Get(ctx context.Context) response.EventResponse {
 	event := ctx.Value("event").(*model.Event)
 	return event.ToResponse()
 }
 
-func (s *EventService) Update(ctx context.Context, req *dto.EventRequest) error {
+func (s *EventService) Update(ctx context.Context, req *request.EventRequest) error {
 	err := validator.Get().Struct(req)
 	if err != nil {
 		return err

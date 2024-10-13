@@ -1,9 +1,9 @@
 package router
 
 import (
-	"github.com/amedoeyes/hadath/internal/handler"
-	"github.com/amedoeyes/hadath/internal/middleware"
-	"github.com/amedoeyes/hadath/internal/repository"
+	"github.com/amedoeyes/hadath/internal/api/handler"
+	"github.com/amedoeyes/hadath/internal/api/middleware"
+	"github.com/amedoeyes/hadath/internal/database/repository"
 	"github.com/amedoeyes/hadath/internal/service"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"

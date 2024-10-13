@@ -3,9 +3,10 @@ package service
 import (
 	"context"
 
-	"github.com/amedoeyes/hadath/internal/dto"
-	"github.com/amedoeyes/hadath/internal/model"
-	"github.com/amedoeyes/hadath/internal/repository"
+	"github.com/amedoeyes/hadath/internal/api/request"
+	"github.com/amedoeyes/hadath/internal/api/response"
+	"github.com/amedoeyes/hadath/internal/database/model"
+	"github.com/amedoeyes/hadath/internal/database/repository"
 	"github.com/amedoeyes/hadath/internal/validator"
 )
 
@@ -19,7 +20,7 @@ func NewBookingService(repo *repository.BookingRepository) *BookingService {
 	}
 }
 
-func (s *BookingService) Create(ctx context.Context, req *dto.BookingRequest) error {
+func (s *BookingService) Create(ctx context.Context, req *request.BookingRequest) error {
 	err := validator.Get().Struct(req)
 	if err != nil {
 		return err
@@ -30,14 +31,14 @@ func (s *BookingService) Create(ctx context.Context, req *dto.BookingRequest) er
 	return s.repo.Create(ctx, user.ID, req.EventID)
 }
 
-func (s *BookingService) ListByCurrentUser(ctx context.Context) ([]dto.EventResponse, error) {
+func (s *BookingService) ListByCurrentUser(ctx context.Context) ([]response.EventResponse, error) {
 	user := ctx.Value("user").(*model.User)
 	events, err := s.repo.ListByUser(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	response := make([]dto.EventResponse, 0, len(events))
+	response := make([]response.EventResponse, 0, len(events))
 	for _, event := range events {
 		response = append(response, event.ToResponse())
 	}
@@ -45,14 +46,14 @@ func (s *BookingService) ListByCurrentUser(ctx context.Context) ([]dto.EventResp
 	return response, nil
 }
 
-func (s *BookingService) ListByEvent(ctx context.Context) ([]dto.UserResponse, error) {
+func (s *BookingService) ListByEvent(ctx context.Context) ([]response.UserResponse, error) {
 	event := ctx.Value("event").(*model.Event)
 	users, err := s.repo.ListByEvent(ctx, event.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	response := make([]dto.UserResponse, 0, len(users))
+	response := make([]response.UserResponse, 0, len(users))
 	for _, user := range users {
 		response = append(response, user.ToResponse())
 	}
@@ -60,7 +61,7 @@ func (s *BookingService) ListByEvent(ctx context.Context) ([]dto.UserResponse, e
 	return response, nil
 }
 
-func (s *BookingService) Delete(ctx context.Context, req *dto.BookingRequest) error {
+func (s *BookingService) Delete(ctx context.Context, req *request.BookingRequest) error {
 	err := validator.Get().Struct(req)
 	if err != nil {
 		return err

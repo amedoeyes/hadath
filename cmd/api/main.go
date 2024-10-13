@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/amedoeyes/hadath/config"
+	"github.com/amedoeyes/hadath/internal/api/router"
 	"github.com/amedoeyes/hadath/internal/database"
-	"github.com/amedoeyes/hadath/internal/router"
 	"github.com/amedoeyes/hadath/internal/validator"
 )
 

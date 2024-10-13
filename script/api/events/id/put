@@ -15,7 +15,7 @@ DATA=$(
 	address: $address,
 	start_time: $start_time,
 	end_time: $end_time
-} | with_entries(select(.value != ""))'
+}'
 )
 
 source "$(dirname "${BASH_SOURCE[0]}")/../../request"

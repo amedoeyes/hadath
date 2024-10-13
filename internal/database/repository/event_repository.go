@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/amedoeyes/hadath/internal/database"
-	"github.com/amedoeyes/hadath/internal/model"
+	"github.com/amedoeyes/hadath/internal/database/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

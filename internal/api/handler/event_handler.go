@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/amedoeyes/hadath/internal/api/response"
-	"github.com/amedoeyes/hadath/internal/dto"
+	"github.com/amedoeyes/hadath/internal/api/request"
 	"github.com/amedoeyes/hadath/internal/service"
 )
 
@@ -20,7 +20,7 @@ func NewEventHandler(service *service.EventService) *EventHandler {
 }
 
 func (h *EventHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var req dto.EventRequest
+	var req request.EventRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		response.HandleError(w, err)
@@ -54,7 +54,7 @@ func (h *EventHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *EventHandler) Update(w http.ResponseWriter, r *http.Request) {
-	var req dto.EventRequest
+	var req request.EventRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		response.HandleError(w, err)

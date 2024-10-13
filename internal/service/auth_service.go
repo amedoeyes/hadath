@@ -3,9 +3,10 @@ package service
 import (
 	"context"
 
-	"github.com/amedoeyes/hadath/internal/dto"
-	"github.com/amedoeyes/hadath/internal/model"
-	"github.com/amedoeyes/hadath/internal/repository"
+	"github.com/amedoeyes/hadath/internal/api/request"
+	"github.com/amedoeyes/hadath/internal/api/response"
+	"github.com/amedoeyes/hadath/internal/database/model"
+	"github.com/amedoeyes/hadath/internal/database/repository"
 	"github.com/amedoeyes/hadath/internal/validator"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -22,7 +23,7 @@ func NewAuthService(apiKeyRepo *repository.APIKeyRepository, userRepo *repositor
 	}
 }
 
-func (s *AuthService) SignUp(ctx context.Context, req *dto.AuthSignUpRequest) error {
+func (s *AuthService) SignUp(ctx context.Context, req *request.AuthSignUpRequest) error {
 	err := validator.Get().Struct(req)
 	if err != nil {
 		return err
@@ -41,7 +42,7 @@ func (s *AuthService) SignUp(ctx context.Context, req *dto.AuthSignUpRequest) er
 	return nil
 }
 
-func (s *AuthService) SignIn(ctx context.Context, req *dto.AuthSignInRequest) (*dto.AuthResponse, error) {
+func (s *AuthService) SignIn(ctx context.Context, req *request.AuthSignInRequest) (*response.AuthResponse, error) {
 	err := validator.Get().Struct(req)
 	if err != nil {
 		return nil, err
@@ -67,7 +68,7 @@ func (s *AuthService) SignIn(ctx context.Context, req *dto.AuthSignInRequest) (*
 		return nil, err
 	}
 
-	response := &dto.AuthResponse{
+	response := &response.AuthResponse{
 		ID:     user.ID,
 		Name:   user.Name,
 		Email:  user.Email,

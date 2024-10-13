@@ -6,6 +6,6 @@ source "$SCRIPT_DIR/../.env"
 
 export GOOSE_DRIVER="postgres"
 export GOOSE_DBSTRING="user=$DB_USER password=$DB_PASSWORD host=$DB_HOST port=$DB_PORT dbname=$DB_NAME sslmode=disable"
-export GOOSE_MIGRATION_DIR="$SCRIPT_DIR/../internal/migration/"
+export GOOSE_MIGRATION_DIR="$SCRIPT_DIR/../internal/database/migration/"
 
 goose $@

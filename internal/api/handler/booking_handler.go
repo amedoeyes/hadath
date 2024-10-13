@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/amedoeyes/hadath/internal/api/response"
-	"github.com/amedoeyes/hadath/internal/dto"
+	"github.com/amedoeyes/hadath/internal/api/request"
 	"github.com/amedoeyes/hadath/internal/service"
 )
 
@@ -20,7 +20,7 @@ func NewBookingHandler(service *service.BookingService) *BookingHandler {
 }
 
 func (h *BookingHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var request dto.BookingRequest
+	var request request.BookingRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		response.HandleError(w, err)
@@ -59,7 +59,7 @@ func (h *BookingHandler) ListByEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *BookingHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	var request dto.BookingRequest
+	var request request.BookingRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		response.HandleError(w, err)

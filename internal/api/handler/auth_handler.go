@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/amedoeyes/hadath/internal/api/request"
 	"github.com/amedoeyes/hadath/internal/api/response"
-	"github.com/amedoeyes/hadath/internal/dto"
 	"github.com/amedoeyes/hadath/internal/service"
 )
 
@@ -20,7 +20,7 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
-	var req dto.AuthSignUpRequest
+	var req request.AuthSignUpRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		response.HandleError(w, err)
@@ -37,7 +37,7 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
-	var req dto.AuthSignInRequest
+	var req request.AuthSignInRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		response.HandleError(w, err)
