@@ -4,61 +4,51 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/amedoeyes/hadath/internal/utility"
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	serverHost string
-	serverPort int
+	ServerHost string
+	ServerPort int
 
-	dbHost     string
-	dbPort     int
-	dbUser     string
-	dbPassword string
-	dbName     string
-}
-
-func (c *Config) ServerHost() string {
-	return c.serverHost
-}
-
-func (c *Config) ServerPort() int {
-	return c.serverPort
-}
-
-func (c *Config) DBHost() string {
-	return c.dbHost
-}
-
-func (c *Config) DBPort() int {
-	return c.dbPort
-}
-
-func (c *Config) DBUser() string {
-	return c.dbUser
-}
-
-func (c *Config) DBPassword() string {
-	return c.dbPassword
-}
-
-func (c *Config) DBName() string {
-	return c.dbName
+	DBHost     string
+	DBPort     int
+	DBUser     string
+	DBPassword string
+	DBName     string
 }
 
 var config *Config
 
-func Load() {
-	godotenv.Load()
-	config = &Config{
-		serverHost: getEnv("SERVER_HOST", "localhost"),
-		serverPort: getEnvAsInt("SERVER_PORT", 8080),
-		dbHost:     getEnv("DB_HOST", "localhost"),
-		dbPort:     getEnvAsInt("DB_PORT", 5432),
-		dbUser:     getEnv("DB_USER", ""),
-		dbPassword: getEnv("DB_PASSWORD", ""),
-		dbName:     getEnv("DB_NAME", ""),
+func Load(files ...string) error {
+	root, err := utility.FindProjectRoot()
+	if err != nil {
+		return err
 	}
+
+	var filenames []string
+	for _, file := range files {
+		filenames = append(filenames, root+"/"+file)
+	}
+
+	err = godotenv.Load(filenames...)
+	if err != nil {
+		return err
+	}
+
+	config = &Config{
+		ServerHost: getEnv("SERVER_HOST", "localhost"),
+		ServerPort: getEnvAsInt("SERVER_PORT", 8080),
+
+		DBHost:     getEnv("DB_HOST", "localhost"),
+		DBPort:     getEnvAsInt("DB_PORT", 5432),
+		DBUser:     getEnv("DB_USER", ""),
+		DBPassword: getEnv("DB_PASSWORD", ""),
+		DBName:     getEnv("DB_NAME", ""),
+	}
+
+	return nil
 }
 
 func Get() *Config {

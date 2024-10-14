@@ -13,17 +13,22 @@ import (
 )
 
 func main() {
-	config.Load()
-	err := database.Connect(context.Background())
+	err := config.Load()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	err = database.Connect(context.Background())
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	database.MigrateUp()
 	defer database.Disconnect()
 	validator.Init()
 
 	cfg := config.Get()
-	addr := fmt.Sprintf("%s:%d", cfg.ServerHost(), cfg.ServerPort())
+	addr := fmt.Sprintf("%s:%d", cfg.ServerHost, cfg.ServerPort)
 	router := router.Setup()
 
 	log.Printf("Starting server at %s", addr)
