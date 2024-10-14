@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/amedoeyes/hadath/internal/api"
 	"github.com/amedoeyes/hadath/internal/api/request"
 	"github.com/amedoeyes/hadath/internal/api/response"
 	"github.com/amedoeyes/hadath/internal/database/model"
@@ -50,7 +51,7 @@ func (s *AuthService) SignIn(ctx context.Context, req *request.AuthSignInRequest
 
 	user, err := s.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
-		return nil, err
+		return nil, api.ErrUnauthorized
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))

@@ -29,7 +29,7 @@ func (h *BookingHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *BookingHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
-	bookings, err := h.service.ListByCurrentUser(r.Context())
+	bookings, err := h.service.ListByUser(r.Context())
 	if err != nil {
 		response.HandleError(w, err)
 		return

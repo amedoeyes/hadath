@@ -25,7 +25,7 @@ func (s *BookingService) Create(ctx context.Context) error {
 	return s.repo.Create(ctx, user.ID, event.ID)
 }
 
-func (s *BookingService) ListByCurrentUser(ctx context.Context) ([]response.EventResponse, error) {
+func (s *BookingService) ListByUser(ctx context.Context) ([]response.EventResponse, error) {
 	user := ctx.Value("user").(*model.User)
 	events, err := s.repo.ListByUser(ctx, user.ID)
 	if err != nil {

@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/amedoeyes/hadath/internal/api/response"
@@ -15,7 +14,6 @@ func EventCtx(repo *repository.EventRepository) func(next http.Handler) http.Han
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			id, err := uuid.Parse(chi.URLParam(r, "id"))
-			fmt.Printf("id: %v\n", id)
 			if err != nil {
 				response.HandleError(w, err)
 				return

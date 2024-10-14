@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/amedoeyes/hadath/internal/api/response"
 	"github.com/amedoeyes/hadath/internal/api/request"
+	"github.com/amedoeyes/hadath/internal/api/response"
 	"github.com/amedoeyes/hadath/internal/service"
 )
 
@@ -66,6 +66,8 @@ func (h *EventHandler) Update(w http.ResponseWriter, r *http.Request) {
 		response.HandleError(w, err)
 		return
 	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *EventHandler) Delete(w http.ResponseWriter, r *http.Request) {

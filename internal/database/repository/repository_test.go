@@ -21,6 +21,11 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
+	err = database.MigrateUp()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	code := m.Run()
 
 	database.Disconnect()
@@ -29,14 +34,8 @@ func TestMain(m *testing.M) {
 
 func setupTest(t *testing.T) {
 	t.Helper()
-	err := database.MigrateUp()
+	_, err := database.Get().Exec(context.Background(), "TRUNCATE TABLE users, api_keys, events, bookings RESTART IDENTITY CASCADE")
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() {
-		err := database.MigrateDown()
-		if err != nil {
-			t.Fatal(err)
-		}
-	})
 }

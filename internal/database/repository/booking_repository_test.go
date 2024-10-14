@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -52,7 +51,6 @@ func TestBookingRepository(t *testing.T) {
 		assert.NoError(t, err)
 
 		users, err := bookingRepo.ListByEvent(ctx, event.ID)
-		fmt.Printf("users: %v\n", users)
 		assert.NoError(t, err)
 		assert.NotEmpty(t, users)
 		assert.Equal(t, *user, users[0])
