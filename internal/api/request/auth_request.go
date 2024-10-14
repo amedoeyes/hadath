@@ -7,6 +7,6 @@ type AuthSignUpRequest struct {
 }
 
 type AuthSignInRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8,max=32"`
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
