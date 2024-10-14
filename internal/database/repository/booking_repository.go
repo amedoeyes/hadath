@@ -80,7 +80,9 @@ func (r *BookingRepository) ListByEvent(ctx context.Context, eventID uuid.UUID) 
 	query := `
 	SELECT
 		user_id,
-		users.name AS user_name
+		users.name,
+		users.email,
+		users.password
 	FROM bookings
 	JOIN users ON users.id = bookings.user_id
 	WHERE bookings.event_id = $1
@@ -97,6 +99,8 @@ func (r *BookingRepository) ListByEvent(ctx context.Context, eventID uuid.UUID) 
 		err := rows.Scan(
 			&user.ID,
 			&user.Name,
+			&user.Email,
+			&user.Password,
 		)
 		if err != nil {
 			return nil, err
