@@ -53,15 +53,18 @@ func Setup() *chi.Mux {
 
 	r.Route("/bookings", func(r chi.Router) {
 		r.Use(authMiddleware)
+		r.Use(currentUserCtxMiddleware)
 
 		r.Route("/user", func(r chi.Router) {
-			r.Use(currentUserCtxMiddleware)
-			r.Post("/", bookingHandler.Create)
-			r.Get("/", bookingHandler.ListByCurrentUser)
-			r.Delete("/", bookingHandler.Delete)
+			r.Get("/", bookingHandler.ListByUser)
 		})
 
-		r.With(eventCtxMiddleware).Get("/event/{id}", bookingHandler.ListByEvent)
+		r.Route("/event/{id}", func(r chi.Router) {
+			r.Use(eventCtxMiddleware)
+			r.Post("/", bookingHandler.Create)
+			r.Get("/", bookingHandler.ListByEvent)
+			r.Delete("/", bookingHandler.Delete)
+		})
 	})
 
 	return r

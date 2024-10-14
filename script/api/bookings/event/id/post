@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ROUTE="bookings/event/$1"
+METHOD="POST"
+
+source "$(dirname "${BASH_SOURCE[0]}")/../../../request"

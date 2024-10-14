@@ -70,6 +70,8 @@ func HandleError(w http.ResponseWriter, err error) {
 			switch err.ConstraintName {
 			case "users_email_key":
 				message = "An account with this email already exists"
+			case "bookings_user_id_event_id_key":
+				message = "User already booked to this event"
 			default:
 				message = err.Error()
 			}

@@ -3,11 +3,9 @@ package service
 import (
 	"context"
 
-	"github.com/amedoeyes/hadath/internal/api/request"
 	"github.com/amedoeyes/hadath/internal/api/response"
 	"github.com/amedoeyes/hadath/internal/database/model"
 	"github.com/amedoeyes/hadath/internal/database/repository"
-	"github.com/amedoeyes/hadath/internal/validator"
 )
 
 type BookingService struct {
@@ -20,15 +18,11 @@ func NewBookingService(repo *repository.BookingRepository) *BookingService {
 	}
 }
 
-func (s *BookingService) Create(ctx context.Context, req *request.BookingRequest) error {
-	err := validator.Get().Struct(req)
-	if err != nil {
-		return err
-	}
-
+func (s *BookingService) Create(ctx context.Context) error {
 	user := ctx.Value("user").(*model.User)
+	event := ctx.Value("event").(*model.Event)
 
-	return s.repo.Create(ctx, user.ID, req.EventID)
+	return s.repo.Create(ctx, user.ID, event.ID)
 }
 
 func (s *BookingService) ListByCurrentUser(ctx context.Context) ([]response.EventResponse, error) {
@@ -61,13 +55,9 @@ func (s *BookingService) ListByEvent(ctx context.Context) ([]response.UserRespon
 	return response, nil
 }
 
-func (s *BookingService) Delete(ctx context.Context, req *request.BookingRequest) error {
-	err := validator.Get().Struct(req)
-	if err != nil {
-		return err
-	}
-
+func (s *BookingService) Delete(ctx context.Context) error {
 	user := ctx.Value("user").(*model.User)
+	event := ctx.Value("event").(*model.Event)
 
-	return s.repo.Delete(ctx, user.ID, req.EventID)
+	return s.repo.Delete(ctx, user.ID, event.ID)
 }

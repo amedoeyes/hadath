@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/amedoeyes/hadath/internal/api/response"
-	"github.com/amedoeyes/hadath/internal/api/request"
 	"github.com/amedoeyes/hadath/internal/service"
 )
 
@@ -20,14 +19,7 @@ func NewBookingHandler(service *service.BookingService) *BookingHandler {
 }
 
 func (h *BookingHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var request request.BookingRequest
-	err := json.NewDecoder(r.Body).Decode(&request)
-	if err != nil {
-		response.HandleError(w, err)
-		return
-	}
-
-	err = h.service.Create(r.Context(), &request)
+	err := h.service.Create(r.Context())
 	if err != nil {
 		response.HandleError(w, err)
 		return
@@ -36,7 +28,7 @@ func (h *BookingHandler) Create(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *BookingHandler) ListByCurrentUser(w http.ResponseWriter, r *http.Request) {
+func (h *BookingHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 	bookings, err := h.service.ListByCurrentUser(r.Context())
 	if err != nil {
 		response.HandleError(w, err)
@@ -59,14 +51,7 @@ func (h *BookingHandler) ListByEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *BookingHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	var request request.BookingRequest
-	err := json.NewDecoder(r.Body).Decode(&request)
-	if err != nil {
-		response.HandleError(w, err)
-		return
-	}
-
-	err = h.service.Delete(r.Context(), &request)
+	err := h.service.Delete(r.Context())
 	if err != nil {
 		response.HandleError(w, err)
 		return
